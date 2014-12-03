@@ -12,7 +12,7 @@ You can use these as a reference to:
  * Be annoyed that there are no implementations in R (or Java, Julia, Haskell, Go, Scheme, Fortran, Brainf*ck--we will review pull requests!) :neckbeard: 
  
 ## Installation
- * Clone the repo or download the raw [`metrics.py`]() file.
+ * Clone the repo or download the raw [`metrics.py`](https://raw.githubusercontent.com/drivendataorg/metrics/master/metrics.py) file.
  * Put the `metrics.py` file in your working directory.
 
 ## Usage
