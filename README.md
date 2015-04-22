@@ -27,4 +27,14 @@ metrics.multi_multi_log_loss(numpy_array_predictions,
                              metrics.BOX_PLOTS_COLUMN_INDICES)
 ```
 
+Similarly, you can run the metric for the [Keeping it Fresh competition](http://www.drivendata.org/competitions/7/).
+
+```python
+import metrics
+
+metrics.weighted_rmsle(numpy_array_predictions, 
+                      numpy_array_actual_values,
+                      weights=metrics.KEEPING_IT_CLEAN_WEIGHTS)
+```
+
 **Disclaimer:** These implementations are not guaranteed to match the implementations in production. There may be numerical differences based on implementation and environment. This code is provided for your convenience only. The only official score is on [DrivenData](http://www.drivendata.org), and the only official description of the metric is on the competition page.
