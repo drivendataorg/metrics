@@ -1,7 +1,8 @@
 import numpy as np
 
-# defined for your convenience; these are the
+# Defined for your convenience; these are the
 # class_column_indices for the Box-Plots for Education competition
+# www.drivendata.org/competitions/4/
 BOX_PLOTS_COLUMN_INDICES = [range(37),
                             range(37,48),
                             range(48,51),
@@ -77,3 +78,4 @@ def weighted_rmsle(predicted, actual, weights=None):
 
         # return RMSLE
         return np.sqrt((log_errors ** 2).mean())
+
