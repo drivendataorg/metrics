@@ -22,7 +22,7 @@ def multi_multi_log_loss(predicted, actual, class_column_indices, eps=1e-15):
     """Multi class, multi-label version of Logarithmic Loss metric.
 
     :param predicted: a 2d numpy array of the predictions that are probabilities [0, 1]
-    :param actual: a 2d numpy array of the same shape as your predictions. 1 for the actual labels, 0 elsewhere 
+    :param actual: a 2d numpy array of the same shape as your predictions. 1 for the actual labels, 0 elsewhere
     :return: The multi-multi log loss score for this set of predictions
     """
     class_scores = np.ones(len(class_column_indices), dtype=np.float64)
@@ -79,3 +79,25 @@ def weighted_rmsle(predicted, actual, weights=None):
         # return RMSLE
         return np.sqrt((log_errors ** 2).mean())
 
+
+def adjusted_mean_absolute_percent_error(predicted, actual, error_weights):
+    """Calculates the mean absolute percent error.
+    :param predicted: The predicted values.
+    :param actual: The actual values.
+    :param error_weights: Available as `e_n` and as a standalone file for nests
+        in the competition materials.
+    """
+    not_nan_mask = ~np.isnan(actual)
+
+    # calculate absolute error
+    abs_error = (np.abs(actual[not_nan_mask] - predicted[not_nan_mask]))
+
+    # calculate the percent error (replacing 0 with 1
+    # in order to avoid divide-by-zero errors).
+    pct_error = abs_error / np.maximum(1, actual[not_nan_mask])
+
+    # adjust error by count accuracies
+    adj_error = pct_error / error_weights[not_nan_mask]
+
+    # return the mean as a percentage
+    return np.mean(adj_error)
