@@ -225,3 +225,60 @@ def fish_metric(actual_all_vid, predicted_all_vid, a_l=0.1, a_n=0.6, a_s=0.3, sp
         per_video_scores[ix] = length_component + edit_component + species_component
 
     return np.mean(per_video_scores)
+
+
+def power_laws_nwrmse(actual, predicted):
+    """ Calcultes NWRMSE for the Power Laws Forecasting competition.
+
+        Data comes in the form:
+        col 0: site id
+        col 1: timestamp
+        col 2: forecast id
+        col 3: consumption value
+
+        Computes the weighted, normalized RMSE per site and then
+        averages across forecasts for a final score.
+    """
+    def _per_forecast_wrmse(actual, predicted, weights=None):
+        """ Calculates WRMSE for a single forecast period.
+        """
+        # limit weights to just the ones we need
+        weights = weights[:actual.shape[0]]
+
+        # NaNs in the actual should be weighted zero
+        nan_mask = np.isnan(actual)
+        weights[nan_mask] = 0
+        actual[nan_mask] = 0
+
+        # calculated weighted rmse
+        total_error = np.sqrt((weights * ((predicted - actual) ** 2)).sum())
+
+        # normalized by actual consumption (avoid division by zero for NaNs)
+        denom = np.mean(actual)
+        denom = denom if denom != 0.0 else 1e-10
+        return total_error / denom
+
+    # flatten and cast forecast ids
+    forecast_ids = actual[:, 2].ravel().astype(int)
+
+    # flatten and cast actual + predictions
+    actual_float = actual[:, 3].ravel().astype(np.float64)
+    predicted_float = predicted[:, 3].ravel().astype(np.float64)
+
+    # get the unique forecasts
+    unique_forecasts = np.unique(forecast_ids)
+    per_forecast_errors = np.zeros_like(unique_forecasts, dtype=np.float64)
+
+    # pre-calc all of the possible weights so we don't need to do so for each site
+    # wi = (3n –2i + 1) / (2n^2)
+    n_obs = 200  # longest forecast is ~192 obs
+    weights = np.arange(1, n_obs + 1, dtype=np.float64)
+    weights = (3 * n_obs - (2 * weights) + 1) / (2 * (n_obs ** 2))
+
+    for i, forecast in enumerate(unique_forecasts):
+        mask = (forecast_ids == forecast)
+        per_forecast_errors[i] = _per_forecast_wrmse(actual_float[mask],
+                                                     predicted_float[mask],
+                                                     weights=weights)
+
+    return np.mean(per_forecast_errors)
